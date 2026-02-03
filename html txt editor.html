@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dark Text Editor</title>
+
+<style>
+  body {
+    margin: 0;
+    background: #0f1117;
+    color: #e6e6e6;
+    font-family: monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #161b22;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  button, input {
+    background: #21262d;
+    color: #e6e6e6;
+    border: 1px solid #30363d;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #30363d;
+  }
+
+  input[type="text"] {
+    width: 200px;
+  }
+
+  textarea {
+    flex: 1;
+    width: 100%;
+    background: #0d1117;
+    color: #e6e6e6;
+    border: none;
+    outline: none;
+    padding: 15px;
+    font-size: 14px;
+    resize: none;
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <button onclick="newFile()">New</button>
+  <input type="file" id="fileInput" accept=".txt,.html,.mhtml" />
+  <input type="text" id="filename" placeholder="filename.html">
+  <button onclick="downloadFile()">Export</button>
+</header>
+
+<textarea id="editor" placeholder="Start typing..."></textarea>
+
+<script>
+  const editor = document.getElementById("editor");
+  const fileInput = document.getElementById("fileInput");
+  const filenameInput = document.getElementById("filename");
+
+  function newFile() {
+    if (editor.value && !confirm("Clear editor?")) return;
+    editor.value = "";
+    filenameInput.value = "";
+  }
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      editor.value = e.target.result;
+      filenameInput.value = file.name;
+    };
+    reader.readAsText(file);
+  });
+
+  function downloadFile() {
+    const name = filenameInput.value || "file.txt";
+    const blob = new Blob([editor.value], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+</script>
+
+</body>
+</html>
